@@ -12,9 +12,9 @@ if __name__ == "__main__":
     pool = multiprocessing.Pool(processes=8)
     
     print " n\ttime\tavg runtime"
-    for n in range(1, 51):
+    for n in range(100, 101):
         t = time.time()
-        N = 10000
+        N = 100
         async_result = pool.map_async(main, [n for i in range(N)])
         while not async_result.ready():
             try:

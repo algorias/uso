@@ -10,11 +10,11 @@ def main((start, step, n)):
 
 
 if __name__ == "__main__":
-    n_processes = 6
+    n_processes = 1
     pool = multiprocessing.Pool(processes=n_processes)
-    
+
     print " n\ttime\tavg"
-    for n in range(11, 16):
+    for n in range(1, 9):
         t = time.time()
 
         async_result = pool.map_async(main, ((i, n_processes, n) for i in range(n_processes)))

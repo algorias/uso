@@ -1,4 +1,7 @@
-import random
+import operator
+
+from collections import Counter
+
 
 def memoize(cache=None):
     if cache is None:
@@ -13,11 +16,7 @@ def memoize(cache=None):
 
 
 def factorial(n):
-    res = 1
-    while n > 1:
-        res *= n
-        n -= 1
-    return res
+    return reduce(operator.mul, xrange(1, n+1))
 
 
 def int_to_vertex(x, n):
@@ -26,4 +25,19 @@ def int_to_vertex(x, n):
 
 def generate_vertices(n, start=0, step=1):
     return (int_to_vertex(i, n) for i in xrange(start, 2**n, step))
+
+
+def get_dimension(cube):
+    return cube.count("*")
+
+
+class CountingDict(dict):
+    def __init__(self):
+        self.counter = Counter()
+
+    def __contains__(self, val):
+        self.counter[val] += 1
+        return False
+
+
 
