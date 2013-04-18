@@ -1,4 +1,4 @@
-import operator
+import time, multiprocessing, operator
 
 from collections import Counter
 
@@ -16,7 +16,7 @@ def memoize(cache=None):
 
 
 def factorial(n):
-    return reduce(operator.mul, xrange(1, n+1))
+    return reduce(operator.mul, xrange(1, n+1), 1.0)
 
 
 def int_to_vertex(x, n):
@@ -39,5 +39,24 @@ class CountingDict(dict):
         self.counter[val] += 1
         return False
 
+
+
+def pmap(f, data, processes=None):
+    """
+    Paralell map.
+    """
+    # TODO: catch keyboardinterrupts cleanly
+    pool = multiprocessing.Pool(processes=processes)
+
+    async_result = pool.map_async(f, data)
+    try:
+        while not async_result.ready():
+            time.sleep(0.01)
+    except KeyboardInterrupt:
+        pool.terminate()
+        pool.join()
+        exit()
+    
+    return async_result.get()
 
 

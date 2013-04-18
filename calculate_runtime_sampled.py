@@ -2,28 +2,20 @@ import itertools, random, multiprocessing, time
 
 import usolib
 
+from usolib.helpers import *
+
 
 def main(n):
-    res = usolib.randomfacet.randomfacet_sample(usolib.fst.bad_uso, n)
-    return res
+    return usolib.randomfacet.randomfacet_sample(usolib.fst.bad_uso, n)
 
 
 if __name__ == "__main__":
-    pool = multiprocessing.Pool(processes=8)
     
     print " n\ttime\tavg runtime"
-    for n in range(100, 101):
+    for n in range(1, 21):
         t = time.time()
-        N = 100
-        async_result = pool.map_async(main, [n for i in range(N)])
-        while not async_result.ready():
-            try:
-                time.sleep(0.1)
-            except KeyboardInterrupt:
-                pool.terminate()
-                pool.join()
-                exit()
-        lst = async_result.get()
+        N = 1000
+        lst = pmap(main, [n for i in range(N)], processes=6)
         res = sum(lst) / float(N)
         print "%2d\t%4.2fs\t%.4f" %(n, time.time() - t, res)
 
