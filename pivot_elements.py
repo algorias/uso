@@ -3,19 +3,17 @@
 This script does some analysis on the runtime of pivot elements, 
 which are (vertex, facet) pairs passed as arguments in the 2nd recursive call of randomfacet.
 """
+import random, itertools
 
 import usolib
-
-
-def xor(x, y):
-    return "0" if x == y else "1" 
+from usolib.helpers import *
 
 
 def flip(w, i):
     """
     Flip the ith dimension of w, i.e. get w ^ {i}, where w is a vertex or a cube.
     """
-    return w[:i] + xor(w[i], "1") + w[i+1:]
+    return w[:i] + ("1" if w[i] == "0" else "0") + w[i+1:]
 
 
 def split(cube, side, i):
@@ -40,11 +38,24 @@ def get_pivots(uso, cube):
             if cube[i] == "*"]
 
 
+def main((vertex, facet)):
+    return usolib.randomfacet.randomfacet_sample(uso, N, cube=facet, vertex=vertex) 
+
 
 if __name__ == "__main__":
-    N = 5
-    lst = get_pivots(usolib.fst.bad_uso, "*" * N)
+    uso = usolib.fst.bad_uso
+    n_processes = 6
+    n_samples = 100
 
-    for i in lst:
-        print i
+    for N in range(101, 151):
+        # sample as uniformly as possible
+        lst = get_pivots(uso, "*" * N)
+        random.shuffle(lst)
+        itr = itertools.cycle(lst)
+        lst = [next(itr) for i in range(100)]
+
+        res = pmap(main, lst, processes=n_processes)
+
+        print "%4d %4.2f" %(N, sum(res) / float(n_samples))
+
 
