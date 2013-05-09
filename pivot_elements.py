@@ -43,7 +43,7 @@ def main((vertex, facet)):
 
 
 if __name__ == "__main__":
-    uso = usolib.fst.bad_uso
+    uso = usolib.uso.bad
     n_processes = 6
     n_samples = 100
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         lst = get_pivots(uso, "*" * N)
         random.shuffle(lst)
         itr = itertools.cycle(lst)
-        lst = [next(itr) for i in range(100)]
+        lst = [next(itr) for i in range(n_samples)]
 
         res = pmap(main, lst, processes=n_processes)
 

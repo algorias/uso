@@ -1,6 +1,6 @@
 import itertools
 
-from helpers import memoize
+from usolib.helpers import memoize
 
 class SimpleFST(object):
     """
@@ -85,21 +85,3 @@ class SimpleFST(object):
             res.append(v)
         return "".join(res)
             
-                
-
-# sample usos
-
-table = {(0, "0"): (1, "+"),
-         (0, "1"): (2, "-"),
-         (1, "0"): (2, "-"),
-         (1, "1"): (0, "+"),
-         (2, "0"): (0, "+"),
-         (2, "1"): (1, "-")}
-bad_uso = SimpleFST(table)
-
-table = {(0, "0"): (0, "-"),
-         (0, "1"): (0, "+")}
-ascending_uso = SimpleFST(table)
-
-del table
-
