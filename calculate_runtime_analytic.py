@@ -6,7 +6,7 @@ from usolib.helpers import *
 
 
 def main((start, step, n)):
-    uso = usolib.uso.bad
+    uso = usolib.uso.bad()
     vertices = generate_vertices(n, start, step)
     return usolib.randomfacet.randomfacet_analytic(uso, n, vertices)
 

@@ -2,20 +2,28 @@ import random
 
 import fst
 
-# trivial uso with 1...1 as the sink
-table = {(0, "0"): (0, "-"),
-         (0, "1"): (0, "+")}
-ascending = fst.SimpleFST(table)
+def ascending():
+    """
+    Trivial uso with 1...1 as the sink.
+    """
+    table = {(0, "0"): (0, "-"),
+             (0, "1"): (0, "+")}
+    return fst.SimpleFST(table)
 
 
-# very slow uso, not a matousek orientation
-table = {(0, "0"): (1, "+"),
-         (0, "1"): (2, "-"),
-         (1, "0"): (2, "-"),
-         (1, "1"): (0, "+"),
-         (2, "0"): (0, "+"),
-         (2, "1"): (1, "-")}
-bad = fst.SimpleFST(table)
+def bad():
+    """
+    Very slow uso.
+    
+    This is not a matousek orientation.
+    """
+    table = {(0, "0"): (1, "+"),
+             (0, "1"): (2, "-"),
+             (1, "0"): (2, "-"),
+             (1, "1"): (0, "+"),
+             (2, "0"): (0, "+"),
+             (2, "1"): (1, "-")}
+    return fst.SimpleFST(table)
 
 
 def matousek1():
@@ -75,7 +83,6 @@ def uar(n):
 
     # states are numbered as follows: the root has label 1. Children of node i have labels 2*i and 2*i + 1
     d = {}
-
     states = xrange(2**(n-1))
     for state in states:
         parity = random.random() > 0.5
@@ -91,7 +98,4 @@ def uar(n):
 
     return fst.SimpleFST(d, start=1)
 
-
-# clean up namespace
-del table
 

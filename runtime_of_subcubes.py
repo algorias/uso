@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     # accumulate data into cache
     cache = CountingDict()
-    get_execution_data(N, usolib.uso.bad, cache)
+    get_execution_data(N, usolib.uso.bad(), cache)
 
     #  
     by_dim = partition(cache.counter, lambda (vertex, subcube), _: get_dimension(subcube))

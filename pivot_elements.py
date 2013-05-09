@@ -43,7 +43,7 @@ def main((vertex, facet)):
 
 
 if __name__ == "__main__":
-    uso = usolib.uso.bad
+    uso = usolib.uso.bad()
     n_processes = 6
     n_samples = 100
 
