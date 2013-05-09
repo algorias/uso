@@ -17,10 +17,10 @@ class SimpleFST(object):
     input and - for the other.
     """
 
-    def __init__(self, table, start_state=0):
+    def __init__(self, table, start=0):
         self.table = table
         self.validate_table()
-        self.start_state = start_state
+        self.start_state = start
         self.build_inverse_table()
 
 
