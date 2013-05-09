@@ -1,4 +1,4 @@
-import time, multiprocessing, operator
+import time, multiprocessing, operator, os, sys, signal
 
 from collections import Counter
 
@@ -40,7 +40,6 @@ class CountingDict(dict):
         return False
 
 
-
 def pmap(f, data, processes=None):
     """
     Paralell map.
@@ -48,17 +47,24 @@ def pmap(f, data, processes=None):
     if processes == 1:
         return map(f, data)
 
-    # TODO: catch keyboardinterrupts cleanly
+    old_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+
     pool = multiprocessing.Pool(processes=processes)
 
-    async_result = pool.map_async(f, data)
-    try:
-        while not async_result.ready():
-            time.sleep(0.01)
-    except KeyboardInterrupt:
+    def handler(*a):
         pool.terminate()
+        sys.stdout.write(" Interrupted!\n")
+        sys.stdout.flush()
         pool.join()
-        exit()
+        sys.exit(1)
+
+    signal.signal(signal.SIGINT, handler)
+
+    async_result = pool.map_async(f, data)
+    while not async_result.ready():
+        time.sleep(0.01)
+
+    signal.signal(signal.SIGINT, old_handler)
     
     return async_result.get()
 
