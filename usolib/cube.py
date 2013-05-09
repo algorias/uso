@@ -26,8 +26,8 @@ class Cube(object):
             # convert from string
             self.data = self._string_to_tuple(data)
         else:
-            # assume data is some iterable.
-            self.data = tuple(i for i in data)
+            # assume data is an iterable of ints
+            self.data = tuple(data)
 
 
     def to_string(self):

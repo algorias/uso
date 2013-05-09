@@ -45,6 +45,9 @@ def pmap(f, data, processes=None):
     """
     Paralell map.
     """
+    if processes == 1:
+        return map(f, data)
+
     # TODO: catch keyboardinterrupts cleanly
     pool = multiprocessing.Pool(processes=processes)
 
