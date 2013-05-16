@@ -19,5 +19,6 @@ if __name__ == "__main__":
         t = time.time()
         lst = pmap(main, ((i, n_processes, n) for i in range(n_processes)), n_processes)
         res = sum(lst) / float(factorial(n) * 2**n)
+        #res = max(lst) / float(factorial(n))
         print "%2d\t%.2fs\t%.4f" %(n, time.time() - t, res)
 

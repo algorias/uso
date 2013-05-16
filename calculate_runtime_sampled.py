@@ -6,7 +6,8 @@ from usolib.helpers import *
 
 
 def main(n):
-    return usolib.randomfacet.randomfacet_sample(usolib.uso.bad(), n)
+    uso = usolib.uso.bad()
+    return usolib.randomfacet.randomfacet_sample(uso, n)
 
 
 if __name__ == "__main__":

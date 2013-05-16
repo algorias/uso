@@ -6,7 +6,7 @@ from usolib.helpers import *
 
 
 def main(n):
-    uso = usolib.uso.uar(20)
+    uso = usolib.uso.uar(10)
     lst = [usolib.randomfacet.randomfacet_sample(uso, 20) for i in range(N)]
     return sum(lst) / float(N)
 
