@@ -65,6 +65,7 @@ def randomfacet_sample(uso, N, cube=None, vertex=None):
 
         choices = [i for (i, dim) in enumerate(cube) if dim == "*"]
         i = random.choice(choices)
+        #i = choices[0]
 
         # recurse on the side where the reference vertex is
         subcube = cube[:i] + vertex[i] + cube[i+1:]
@@ -87,6 +88,7 @@ def randomfacet_sample(uso, N, cube=None, vertex=None):
         # choose random vertex
         v = random.randint(0, 2**N-1)
         vertex = int_to_vertex(v, N)
+        #vertex = "0"*N
 
     return RF(vertex, cube)[0]
 
