@@ -10,8 +10,8 @@ def get_execution_data(n, uso, cache=None):
     if cache is None:
         cache = {}
     # replace cache with own cache instance
-    usolib.randomfacet.cache = cache
-    usolib.randomfacet.randomfacet_analytic(uso, n)
+    #usolib.randomfacet.cache = cache
+    usolib.randomfacet.randomfacet_analytic(uso, n, cache)
     return cache
 
 

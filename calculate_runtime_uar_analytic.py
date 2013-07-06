@@ -6,12 +6,11 @@ from usolib.helpers import *
 N = 4
 
 def main(uso):
-    usolib.randomfacet.cache.clear()
-    return usolib.randomfacet.randomfacet_analytic(uso, N) / float(factorial(N) * 2**N)
+    return usolib.randomfacet.randomfacet_analytic(uso, N) / float(factorial(N) * 2**N, cache={})
 
 
 if __name__ == "__main__":
-    usos = list(usolib.uso.itr_all(N))
+    usos = list(usolib.uso.itr_all_by_dim(N))
     lst = pmap(main, usos, processes=6)
     res = sum(lst)
     print (res / len(usos))
