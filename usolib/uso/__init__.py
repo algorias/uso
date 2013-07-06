@@ -116,7 +116,7 @@ def uar(n):
     return fst.SimpleFST(d, start=1)
 
 
-def itr_all(n):
+def itr_all_by_dim(n):
     """
     Return iterator yielding all regular usos of dimension n.
     """
@@ -139,4 +139,45 @@ def itr_all(n):
             d[(state, "1")] = (1, "-" if parity else "+")
 
         yield fst.SimpleFST(d, start=1)
+
+
+
+def itr_all_by_states(k):
+    """
+    Return iterator yielding all regular usos with at most k sates.
+
+    The implementation does not guarantee that an uso won't be returned multiple times.
+    """
+    
+    states = range(k)
+        
+    # all possible combinations of 0 transitions
+    for lst_0 in itertools.product(states, repeat=len(states)):
+
+        # all possible combinations of 1 transitions
+        for lst_1 in itertools.product(states, repeat=len(states)):
+
+            # 0 is always the start state. 
+            # states from 0 to j are odd, from j+1 to k-1 they are even
+            # the start state is always odd, and there is always at least one even state.
+            for j in range(k-1):
+            
+                # actually generate the uso
+                d = {}
+                for state in states[:j+1]:
+                    # odd states
+                    d[(state, "0")] = (lst_0[state], "+")
+                    d[(state, "1")] = (lst_1[state], "-")
+
+                for state in states[j+1:]:
+                    # even states
+                    d[(state, "0")] = (lst_0[state], "-")
+                    d[(state, "1")] = (lst_1[state], "+")
+
+                yield fst.SimpleFST(d, start=0)
+                    
+
+                
+        
+
 
