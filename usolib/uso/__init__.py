@@ -1,4 +1,4 @@
-import random
+import random, itertools
 
 import fst
 
@@ -100,7 +100,7 @@ def uar(n):
         d[(state, "0")] = (2*state, "+" if parity else "-")
         d[(state, "1")] = (2*state + 1, "-" if parity else "+")
 
-    # rightmost states of tree need to point somewhere, loop back for simplicity
+    # leaves of tree need to point somewhere
     states = xrange(2**(n-1), 2**n)
     for state in states:
         parity = random.random() > 0.5
@@ -114,4 +114,29 @@ def uar(n):
     d[("desc", "1")] = ("desc", "+")
 
     return fst.SimpleFST(d, start=1)
+
+
+def itr_all(n):
+    """
+    Return iterator yielding all regular usos of dimension n.
+    """
+
+    for bits in itertools.product([True, False], repeat=2**n-1):
+        # states are numbered as follows: the root has label 1. Children of node i have labels 2*i and 2*i + 1
+        d = {}
+        bits = iter(bits)
+        states = range(1, 2**(n-1))
+        for state in states:
+            parity = next(bits)
+            d[(state, "0")] = (2*state, "+" if parity else "-")
+            d[(state, "1")] = (2*state + 1, "-" if parity else "+")
+
+        # leaves of tree need to point somewhere
+        states = range(2**(n-1), 2**n)
+        for state in states:
+            parity = next(bits)
+            d[(state, "0")] = (1, "+" if parity else "-")
+            d[(state, "1")] = (1, "-" if parity else "+")
+
+        yield fst.SimpleFST(d, start=1)
 
