@@ -17,12 +17,19 @@ class SimpleFST(object):
     input and - for the other.
     """
 
-    def __init__(self, table, start=0):
+    def __init__(self, table=None, start=0, edges=None):
+        # two ways to initialize the automaton, keep both for compatibility
+        if table is None:
+            assert edges is not None
+            table = self.table_from_edges(edges)
+        else:
+            assert edges is None
         self.table = table
         self.validate_table()
         self.start_state = start
         self.build_inverse_table()
 
+    
 
     def validate_table(self):
         """ Check if table describes a simple FST."""
@@ -112,12 +119,16 @@ class SimpleFST(object):
     def get_edges(self):
         edges = [(q_old, a, b, q_new) for ((q_old, a), (q_new, b)) in self.table.iteritems()]
         return sorted(edges)
-        
-            
+
+
+    def table_from_edges(self, edges):
+        return dict(((q_old, a), (q_new,b)) for (q_old, a, b, q_new) in edges)
+
 
 def uniq(usos, n):
     """
-    Take a set of usos and remove functional duplicates up to dimension n.
+    Take an iterator of usos and remove functional duplicates up to dimension n.
     """
     d = dict((uso.fingerprint(n), uso) for uso in usos)
     return d.values()
+
