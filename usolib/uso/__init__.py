@@ -148,6 +148,11 @@ def itr_all_by_states(k):
 
     The implementation does not guarantee that an uso won't be returned multiple times.
     """
+
+    if k == 1:
+        # special case that doesn't work due to an optimization below
+        yield ascending()
+        return
     
     states = range(k)
         
@@ -175,9 +180,5 @@ def itr_all_by_states(k):
                     d[(state, "1")] = (lst_1[state], "+")
 
                 yield fst.SimpleFST(d, start=0)
-                    
-
-                
-        
-
+    
 
