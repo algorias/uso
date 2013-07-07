@@ -85,4 +85,39 @@ class SimpleFST(object):
 
             res.append(v)
         return "".join(res)
+
+
+    def fingerprint(self, n):
+        """
+        Unroll automaton into tree of depth n, then make a fingerprint out of the DFS of that tree.
+
+        If two such fingerprints are equal, then the automatons are equivalent up to n dimensions.
+        """
+
+        return "".join(self._fingerprint_itr(n, self.start_state))
+
+
+    def _fingerprint_itr(self, n, state):
+        if n <= 0:
+            return
+        nextstate, out = self.table[state, "0"]
+        yield out
+        for i in self._fingerprint_itr(n-1, nextstate):
+            yield i
+        nextstate, out = self.table[state, "1"]     
+        for i in self._fingerprint_itr(n-1, nextstate):
+            yield i
+
+
+    def get_edges(self):
+        edges = [(q_old, a, b, q_new) for ((q_old, a), (q_new, b)) in self.table.iteritems()]
+        return sorted(edges)
+        
             
+
+def uniq(usos, n):
+    """
+    Take a set of usos and remove functional duplicates up to dimension n.
+    """
+    d = dict((uso.fingerprint(n), uso) for uso in usos)
+    return d.values()
