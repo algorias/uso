@@ -1,4 +1,4 @@
-import time, multiprocessing, operator, os, sys, signal
+import time, multiprocessing, operator, os, sys, signal, functools
 
 from collections import Counter
 
@@ -40,16 +40,27 @@ class CountingDict(dict):
         return False
 
 
-def pmap(f, data, processes=None):
+pool = None
+
+def pmap(f, data, processes=1, args=()):
     """
     Paralell map.
     """
+    f = functools.partial(f, *args)
+
     if processes == 1:
         return map(f, data)
 
     old_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    pool = multiprocessing.Pool(processes=processes)
+    #pool = multiprocessing.Pool(processes=processes)
+
+    global pool
+    if pool is None:
+        pool = multiprocessing.Pool(processes=processes)
+    elif processes != pool._processes:
+        print ("Warning: %d processes requested, but pool already initialized with %d." 
+               % (processes, pool._processes))
 
     def handler(*a):
         pool.terminate()
@@ -65,7 +76,7 @@ def pmap(f, data, processes=None):
         time.sleep(0.01)
 
     signal.signal(signal.SIGINT, old_handler)
-    
+
     return async_result.get()
 
 
