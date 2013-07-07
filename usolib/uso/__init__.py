@@ -26,6 +26,22 @@ def bad():
     return fst.SimpleFST(table)
 
 
+def bad4state():
+    """
+    Worst 4-state uso, found by tournament.
+    """
+    edges = [(0, '0', '+', 0),
+             (0, '1', '-', 3),
+             (1, '0', '+', 3),
+             (1, '1', '-', 0),
+             (2, '0', '-', 1),
+             (2, '1', '+', 2),
+             (3, '0', '-', 2),
+             (3, '1', '+', 1)]
+    return fst.SimpleFST(edges=edges)
+
+
+
 def matousek1():
     """
     Matousek uso with a matrix of the form:
