@@ -26,26 +26,24 @@ def filter_usos(usos, N):
 
 
 if __name__ == "__main__":
-    K = 5
+    K = 3
     usos_itr = usolib.uso.itr_all_by_states(K)
-    fd = open("/home/vitor/usos.txt", "w")
-    test_set = set()
-    count = 0
-    raw_count = 0
+    usos = usolib.uso.fst.uniq(usos_itr, 2*K - 1)
 
-    for uso in usos_itr:
-        raw_count += 1
-        if not raw_count % 1000:
-            print "%8d  %8d" % (raw_count, count)
+    for N in range(4, 21, 2):
+        t = time.time()
+        lst = pmap(runtime_sampled, usos, processes=6, args=(N,))
+        lst = sorted(lst)[-int(len(lst)*0.5):]
+        usos = [uso for (runtime, uso) in lst]
+        print "N=%d  %ds  %d usos" % (N, time.time() - t, len(usos))
+        print "best candidate:"
+        for i in usos[-1].get_edges():
+            print i
+        print
 
-        fingerprint = uso.fingerprint(2*K - 1)
-        if fingerprint in test_set:
-            continue
-        test_set.add(fingerprint)
+    for uso in usos:
         for i in uso.get_edges():
-            print >> fd, i
-        print >> fd
-        count += 1
+            print i
+        print
 
-    print "%7d  %7d" % (raw_count, count)
-    
+
