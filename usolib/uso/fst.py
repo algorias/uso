@@ -25,8 +25,8 @@ class SimpleFST(object):
         else:
             assert edges is None
         self.table = table
-        self.validate_table()
         self.start_state = start
+        self.validate_table()
         self.build_inverse_table()
 
     
@@ -34,6 +34,7 @@ class SimpleFST(object):
     def validate_table(self):
         """ Check if table describes a simple FST."""
         states = set(state for (state, v) in self.table)
+        assert self.start_state in states
 
         for state in states:
             # make sure transitions exist and are valid
@@ -47,6 +48,7 @@ class SimpleFST(object):
 
             # make sure state is either even or odd
             assert out0 != out1
+
 
     
     def build_inverse_table(self):
