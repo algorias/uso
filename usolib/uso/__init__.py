@@ -132,7 +132,7 @@ def uar(n):
     return fst.SimpleFST(d, start=1)
 
 
-def itr_all_by_dim(n):
+def all_by_dim(n):
     """
     Return iterator yielding all regular usos of dimension n.
     """
@@ -158,7 +158,7 @@ def itr_all_by_dim(n):
 
 
 
-def itr_all_by_states(k):
+def all_by_states(k):
     """
     Return iterator yielding all regular usos with at most k sates.
 
@@ -170,31 +170,32 @@ def itr_all_by_states(k):
         yield ascending()
         return
     
+    # 0 is always the start state. 
+    # states from 0 to j are odd, from j+1 to k-1 they are even
+    # the start state is always odd, and there is always at least one even state.
+    for n_odd in range(1, k):
+        for i in _itr_by_states_parity(k, n_odd):
+            yield i
+    
+
+def _itr_by_states_parity(k, n_odd):
     states = range(k)
-        
     # all possible combinations of 0 transitions
     for lst_0 in itertools.product(states, repeat=len(states)):
 
         # all possible combinations of 1 transitions
         for lst_1 in itertools.product(states, repeat=len(states)):
 
-            # 0 is always the start state. 
-            # states from 0 to j are odd, from j+1 to k-1 they are even
-            # the start state is always odd, and there is always at least one even state.
-            for j in range(k-1):
-            
-                # actually generate the uso
-                d = {}
-                for state in states[:j+1]:
-                    # odd states
-                    d[(state, "0")] = (lst_0[state], "+")
-                    d[(state, "1")] = (lst_1[state], "-")
+            # actually generate the uso
+            d = {}
+            for state in states[:n_odd]:
+                # odd states
+                d[(state, "0")] = (lst_0[state], "+")
+                d[(state, "1")] = (lst_1[state], "-")
 
-                for state in states[j+1:]:
-                    # even states
-                    d[(state, "0")] = (lst_0[state], "-")
-                    d[(state, "1")] = (lst_1[state], "+")
+            for state in states[n_odd:]:
+                # even states
+                d[(state, "0")] = (lst_0[state], "-")
+                d[(state, "1")] = (lst_1[state], "+")
 
-                yield fst.SimpleFST(d, start=0)
-    
-
+            yield fst.SimpleFST(d, start=0)

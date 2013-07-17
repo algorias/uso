@@ -10,7 +10,7 @@ def main(uso):
 
 
 if __name__ == "__main__":
-    usos = list(usolib.uso.itr_all_by_dim(N))
+    usos = list(usolib.uso.all_by_dim(N))
     lst = pmap(main, usos, processes=6)
     res = sum(lst)
     print (res / len(usos))

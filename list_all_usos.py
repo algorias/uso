@@ -26,8 +26,8 @@ def filter_usos(usos, N):
 
 
 if __name__ == "__main__":
-    K = 5
-    usos_itr = usolib.uso.itr_all_by_states(K)
+    K = 4
+    usos_itr = usolib.uso.all_by_states(K)
     fd = open("/home/vitor/usos.txt", "w")
     test_set = set()
     count = 0
