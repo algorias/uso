@@ -174,28 +174,34 @@ def all_by_states(k):
     # states from 0 to j are odd, from j+1 to k-1 they are even
     # the start state is always odd, and there is always at least one even state.
     for n_odd in range(1, k):
-        for i in _itr_by_states_parity(k, n_odd):
+        for i in _itr_states_parity(k, n_odd):
             yield i
     
 
-def _itr_by_states_parity(k, n_odd):
+def _itr_states_parity(k, n_odd):
+    """
+    Helper function for all_by_states.
+    """
+    available_edges = []
+    for state in range(n_odd):
+        available_edges.append((state, "0", "+"))
+        available_edges.append((state, "1", "-"))
+    for state in range(n_odd, k):
+        available_edges.append((state, "0", "-"))
+        available_edges.append((state, "1", "+"))
+
+    for uso in _itr_edgeset(k, available_edges):
+        yield uso
+
+
+def _itr_edgeset(k, edges):
     states = range(k)
-    # all possible combinations of 0 transitions
-    for lst_0 in itertools.product(states, repeat=len(states)):
+    states_set = set(states[1:])
 
-        # all possible combinations of 1 transitions
-        for lst_1 in itertools.product(states, repeat=len(states)):
+    for to_states in itertools.product(states, repeat=2*k):
+        if states_set.difference(to_states):
+            # not all states are reachable
+            continue
+        lst = [(q1, a, b, q2) for ((q1, a, b), q2) in zip(edges, to_states)]
+        yield fst.SimpleFST(edges=lst)
 
-            # actually generate the uso
-            d = {}
-            for state in states[:n_odd]:
-                # odd states
-                d[(state, "0")] = (lst_0[state], "+")
-                d[(state, "1")] = (lst_1[state], "-")
-
-            for state in states[n_odd:]:
-                # even states
-                d[(state, "0")] = (lst_0[state], "-")
-                d[(state, "1")] = (lst_1[state], "+")
-
-            yield fst.SimpleFST(d, start=0)
