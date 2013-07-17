@@ -1,14 +1,15 @@
 import random, itertools
 
 import fst
+from usolib.graph_helpers import *
 
-def ascending():
+def descending():
     """
-    Trivial uso with 1...1 as the sink.
+    Trivial uso with 0...0 as the sink.
     """
-    table = {(0, "0"): (0, "-"),
-             (0, "1"): (0, "+")}
-    return fst.SimpleFST(table)
+    edges = [(0, "0", "+", 0),
+             (0, "1", "-", 0)]
+    return fst.SimpleFST(edges=edges)
 
 
 def bad():
@@ -167,8 +168,11 @@ def all_by_states(k):
 
     if k == 1:
         # special case that doesn't work due to an optimization below
-        yield ascending()
+        yield descending()
         return
+
+    for uso in all_by_states(k-1):
+        yield uso
     
     # 0 is always the start state. 
     # states from 0 to j are odd, from j+1 to k-1 they are even
@@ -199,9 +203,9 @@ def _itr_edgeset(k, edges):
     states_set = set(states[1:])
 
     for to_states in itertools.product(states, repeat=2*k):
-        if states_set.difference(to_states):
-            # not all states are reachable
-            continue
         lst = [(q1, a, b, q2) for ((q1, a, b), q2) in zip(edges, to_states)]
+        if not minimal_heuristic(lst):
+            # fst was already realized with less states
+            continue
         yield fst.SimpleFST(edges=lst)
 
