@@ -91,7 +91,6 @@ class SimpleFST(object):
                 # jump
                 state, _ = self.table[state, dim]
                 v = dim
-
             res.append(v)
         return "".join(res)
 
@@ -117,6 +116,36 @@ class SimpleFST(object):
         for i in self._fingerprint_itr(n-1, nextstate):
             yield i
 
+
+    @memoize()
+    def fingerprint_subcube(self, subcube):
+        """
+        produce a fingerprint of the transducer of a subcube.
+        doesn't guarantee absolutely identical automatons, only identical up to the dimension they're being
+        evaluated to.
+        """
+        return "".join(self._fingerprint_subcube_itr(subcube, self.start_state))
+
+
+    def _fingerprint_subcube_itr(self, subcube, state):
+        if subcube == "":
+            return
+
+        head = subcube[0]
+        subcube = subcube[1:]
+        if head == "*":
+            nextstate, out = self.table[state, "0"]
+            yield out
+            for i in self._fingerprint_subcube_itr(subcube, nextstate):
+                yield i
+            nextstate, out = self.table[state, "1"]     
+            for i in self._fingerprint_subcube_itr(subcube, nextstate):
+                yield i
+        else:
+            nextstate, _ = self.table[state, head]
+            for i in self._fingerprint_subcube_itr(subcube, nextstate):
+                yield i
+        
 
     def get_edges(self):
         edges = [(q_old, a, b, q_new) for ((q_old, a), (q_new, b)) in self.table.iteritems()]
