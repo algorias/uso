@@ -18,13 +18,13 @@ def bad():
     
     This is not a matousek orientation.
     """
-    table = {(0, "0"): (1, "+"),
-             (0, "1"): (2, "-"),
-             (1, "0"): (2, "-"),
-             (1, "1"): (0, "+"),
-             (2, "0"): (0, "+"),
-             (2, "1"): (1, "-")}
-    return fst.SimpleFST(table)
+    edges = [(0, "0", "+", 1),
+             (0, "1", "-", 2),
+             (1, "0", "-", 2),
+             (1, "1", "+", 0),
+             (2, "0", "+", 0),
+             (2, "1", "-", 1)]
+    return fst.SimpleFST(edges = edges)
 
 
 def bad4state():
@@ -55,15 +55,16 @@ def matousek1():
 
     Randomfacet runs slowly on this.
     """
-    table = {("start", "0"): ("start", "+"),
-             ("start", "1"): ("e2", "-"),
-             ("e1", "0"): ("e2", "-"),
-             ("e1", "1"): ("start", "+"),
-             ("e2", "0"): ("o1", "-"),
-             ("e2", "1"): ("e1", "+"),
-             ("o1", "0"): ("e1", "+"),
-             ("o1", "1"): ("o1", "-")}
-    return fst.SimpleFST(table, start="start")
+    edges = [("start", "0", "+", "start"),
+             ("start", "1", "-", "e2"),
+             ("e1", "0", "-", "e2"),
+             ("e1", "1", "+", "start"),
+             ("e2", "0", "-", "o1"),
+             ("e2", "1", "+", "e1"),
+             ("o1", "0", "+", "e1"),
+             ("o1", "1", "-", "o1")]
+
+    return fst.SimpleFST(edges=edges, start="start")
 
 
 def klee_minty():
@@ -74,41 +75,17 @@ def klee_minty():
     recurse into the smallest available dimension, for a runtime of 2^n. The expected runtime, 
     in constrast, is O(n^2).
     """
-    table = {("odd", "0") : ("odd", "+"),
-             ("odd", "1") : ("even", "-"),
-             ("even", "0") : ("even", "-"),
-             ("even", "1") : ("odd", "+")}
-    return fst.SimpleFST(table, start="even")
+    edges = [("odd", "0", "+", "odd"),
+             ("odd", "1", "-", "even"),
+             ("even", "0", "-", "even"),
+             ("even", "1", "+", "odd")]
+    return fst.SimpleFST(edges=edges, start="even")
 
-    # another variant
-    #table = {("odd", "0") : ("even", "+"),
-    #         ("odd", "1") : ("odd", "-"),
-    #         ("even", "0") : ("odd", "-"),
-    #         ("even", "1") : ("even", "+")}
-    #return fst.SimpleFST(table, start="odd")
-
-
-
-def random_circle(k):
-    """
-    Build random uso by taking k states of random parities and linking them together in a circle
-    """
-    parities = [random.random() > 0.5 for i in range(k)]
-
-    # move clockwise when input is 0, otherwise ccw
-    d1 = dict(((state, "0"), ((state+1)%k, "+" if parities[state] else "-")) for state in range(k))
-    d2 = dict(((state, "1"), ((state-1)%k, "-" if parities[state] else "+")) for state in range(k))
-
-    d1.update(d2)
-
-    return fst.SimpleFST(d1)
-    
 
 def uar(n):
     """
     Build an uso taken uar from USO_id.
     """
-
     # states are numbered as follows: the root has label 1. Children of node i have labels 2*i and 2*i + 1
     d = {}
     states = xrange(2**(n-1))
@@ -137,7 +114,6 @@ def all_by_dim(n):
     """
     Return iterator yielding all regular usos of dimension n.
     """
-
     for bits in itertools.product([True, False], repeat=2**n-1):
         # states are numbered as follows: the root has label 1. Children of node i have labels 2*i and 2*i + 1
         d = {}
@@ -158,14 +134,12 @@ def all_by_dim(n):
         yield fst.SimpleFST(d, start=1)
 
 
-
 def all_by_states(k):
     """
     Return iterator yielding all regular usos with at most k sates.
 
     The implementation does not guarantee that an uso won't be returned multiple times.
     """
-
     if k == 1:
         # special case that doesn't work due to an optimization below
         yield descending()
