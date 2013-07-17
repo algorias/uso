@@ -136,7 +136,7 @@ def all_by_dim(n):
 
 def all_by_states(k):
     """
-    Return iterator yielding all regular usos with at most k sates.
+    Return iterator yielding all regular usos with at most k states.
 
     The implementation does not guarantee that an uso won't be returned multiple times.
     """
@@ -152,8 +152,8 @@ def all_by_states(k):
     # states from 0 to j are odd, from j+1 to k-1 they are even
     # the start state is always odd, and there is always at least one even state.
     for n_odd in range(1, k):
-        for i in _itr_states_parity(k, n_odd):
-            yield i
+        for uso in _itr_states_parity(k, n_odd):
+            yield uso
     
 
 def _itr_states_parity(k, n_odd):
@@ -174,12 +174,11 @@ def _itr_states_parity(k, n_odd):
 
 def _itr_edgeset(k, edges):
     states = range(k)
-    states_set = set(states[1:])
 
     for to_states in itertools.product(states, repeat=2*k):
         lst = [(q1, a, b, q2) for ((q1, a, b), q2) in zip(edges, to_states)]
         if not minimal_heuristic(lst):
-            # fst was already realized with less states
+            # fst can be realized with less states
             continue
         yield fst.SimpleFST(edges=lst)
 
