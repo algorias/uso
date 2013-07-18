@@ -102,3 +102,25 @@ def hopcroft_fingerprint(uso):
         return ""
 
     return "".join(res)
+
+
+def uniq(usos, quiet=False):
+    """
+    Take an uso iterator, and produce an iterator that filters out repeated usos.
+    """
+    test = set([""])
+    count = 0
+    uniq_count = 0
+    for uso in usos:
+        count += 1
+        if (not quiet) and (not count % 1000):
+            print "%8d  %8d" % (count, uniq_count)
+        fingerprint = hopcroft_fingerprint(uso)
+        if fingerprint in test:
+            continue
+        test.add(fingerprint)
+        uniq_count += 1
+        yield uso
+    if not quiet:
+        print "%8d  %8d" % (count, uniq_count)
+

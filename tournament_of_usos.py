@@ -31,10 +31,13 @@ def print_statistic(usos):
 
 
 if __name__ == "__main__":
-    K = 5
+    K = 6
     #usos_itr = usolib.uso.all_by_states(K)
-    usos_itr = usolib.uso.all_bosshard(K)
-    usos = list(usolib.uso.fst.uniq(usos_itr, 2*K - 1))
+    #usos_itr = usolib.uso.all_bosshard(K)
+    usos_itr = usolib.uso.all_bosshard_half_odd(K)
+    usos = list(usolib.uso.fst_helpers.uniq(usos_itr))
+
+    exit()
 
     for N in range(8, 39, 2):
         print "N=%s" % N

@@ -1,7 +1,7 @@
 import random, itertools
 
-import fst
-from usolib.graph_helpers import *
+import fst, fst_helpers
+from fst_helpers import *
 
 def descending():
     """
@@ -190,6 +190,11 @@ def all_bosshard(k):
     for n_odd in range(1, k):
         for uso in _itr_bosshard(k, n_odd):
             yield uso
+
+
+def all_bosshard_half_odd(k):
+    for uso in _itr_bosshard(k, k/2):
+        yield uso
 
 
 def _itr_bosshard(k, n_odd):

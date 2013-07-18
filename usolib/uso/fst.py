@@ -149,11 +149,3 @@ class SimpleFST(object):
     def table_from_edges(self, edges):
         return dict(((q_old, a), (q_new,b)) for (q_old, a, b, q_new) in edges)
 
-
-def uniq(usos, n):
-    """
-    Take an iterator of usos and remove functional duplicates up to dimension n.
-    """
-    d = dict((uso.fingerprint(n), uso) for uso in usos)
-    return d.values()
-
