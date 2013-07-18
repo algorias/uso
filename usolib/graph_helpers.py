@@ -15,7 +15,7 @@ def redundant_states(edges):
     Given a set of edges, find states that are unneeded.
     """
     # initialize every state with its own parity
-    d = dict((q1, set([b])) for (q1, a, b, q2) in edges if a == "0")
+    d = dict((q1, set([b])) for (q1, a, b, _) in edges if a == "0")
 
     # iteratively update reachable parities for each state
     k = len(edges) / 2
@@ -50,4 +50,12 @@ def minimal_heuristic(edges):
     return True
         
             
+def is_bosshard(edges):
+    # dict of parities
+    d = dict((q1, b) for (q1, a, b, _) in edges if a == "0")
+
+    res = set((q1, d[q2]) for (q1, _, _, q2) in edges)
+    if len(res) == len(edges):
+        return True
+    return False
 
