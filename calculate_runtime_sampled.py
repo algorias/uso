@@ -1,7 +1,6 @@
-import itertools, random, multiprocessing, time
+import time
 
 import usolib
-
 from usolib.helpers import *
 
 
@@ -11,7 +10,6 @@ def main(n):
 
 
 if __name__ == "__main__":
-    
     print " n\ttime\tavg runtime"
     for n in range(1, 21):
         t = time.time()

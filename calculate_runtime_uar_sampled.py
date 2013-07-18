@@ -1,9 +1,9 @@
-import itertools, random, multiprocessing, time
+import time
 
 import usolib
 from usolib.helpers import *
 
-N = 4
+N = 3
 
 def main(n_samples):
     """

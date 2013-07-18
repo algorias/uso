@@ -1,5 +1,4 @@
-import itertools, random, multiprocessing, time
-from itertools import product
+import time
 
 import usolib
 from usolib.helpers import *
@@ -13,7 +12,6 @@ def main(n, step, start):
 
 if __name__ == "__main__":
     n_processes = 6
-
     print " n\ttime\tavg"
     for n in range(1, 11):
         t = time.time()

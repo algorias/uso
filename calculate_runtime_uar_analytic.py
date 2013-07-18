@@ -1,12 +1,12 @@
-import itertools, random, multiprocessing, time
+import time
 
 import usolib
 from usolib.helpers import *
 
-N = 4
+N = 3
 
 def main(uso):
-    return usolib.randomfacet.randomfacet_analytic(uso, N) / float(factorial(N) * 2**N, cache={})
+    return usolib.randomfacet.randomfacet_analytic(uso, N, cache={}) / float(factorial(N) * 2**N)
 
 
 if __name__ == "__main__":
