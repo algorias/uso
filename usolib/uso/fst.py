@@ -36,7 +36,7 @@ class SimpleFST(object):
         """ Check if table describes a simple FST."""
         assert self.start_state in self.states
 
-        for state in states:
+        for state in self.states:
             # make sure transitions exist and are valid
             nextstate, out0 = self.table[state, "0"]
             assert nextstate in self.states
