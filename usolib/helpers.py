@@ -19,6 +19,10 @@ def factorial(n):
     return reduce(operator.mul, xrange(1, n+1), 1.0)
 
 
+def average(lst):
+    return sum(lst) / float(len(lst))
+
+
 def int_to_vertex(x, n):
     return bin(x)[2:].zfill(n)
 

@@ -16,31 +16,39 @@ def runtime_analytic(N, uso):
     return usolib.randomfacet.randomfacet_analytic(uso, N, cache={}) / float(factorial(N) * 2**N), uso
 
 
+def print_statistic(usos):
+    avg = average([runtime for (runtime, uso) in usos])
+    mx = max(runtime for (runtime, uso) in usos)
+    print "avg runtime: %s" % avg
+    print "max runtime: %s" % usos[-1][0]
+    print "min runtime: %s" % usos[0][0]
 
-def filter_usos(usos, N):
-    """
-    Take a list of (uso, runtime) tuples and filters out those faster than bad on this dimension.
-    """
-    threshold = runtime_analytic(N, usolib.uso.bad())[1]
-    return [(uso, runtime) for (uso, runtime) in usos if runtime >= threshold]
+    print "slowest candidate:"
+    for i in usos[-1][1].get_edges():
+        print i
+
+    print
 
 
 if __name__ == "__main__":
-    K = 3
-    usos_itr = usolib.uso.itr_all_by_states(K)
-    usos = usolib.uso.fst.uniq(usos_itr, 2*K - 1)
+    K = 5
+    #usos_itr = usolib.uso.all_by_states(K)
+    usos_itr = usolib.uso.all_bosshard(K)
+    usos = list(usolib.uso.fst.uniq(usos_itr, 2*K - 1))
 
-    for N in range(4, 21, 2):
+    for N in range(8, 39, 2):
+        print "N=%s" % N
+        print "testing %d usos" % len(usos)
         t = time.time()
         lst = pmap(runtime_sampled, usos, processes=6, args=(N,))
-        lst = sorted(lst)[-int(len(lst)*0.5):]
-        usos = [uso for (runtime, uso) in lst]
-        print "N=%d  %ds  %d usos" % (N, time.time() - t, len(usos))
-        print "best candidate:"
-        for i in usos[-1].get_edges():
-            print i
-        print
+        print "finished in %d seconds" % (time.time() - t)
 
+        lst = sorted(lst)
+        print_statistic(lst)
+        lst = lst[-int(len(lst)*0.5):]
+        usos = [uso for (runtime, uso) in lst]
+
+    print "all survivors:"
     for uso in usos:
         for i in uso.get_edges():
             print i
