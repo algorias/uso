@@ -29,8 +29,7 @@ def randomfacet_analytic(uso, n, vertices=None, cube=None, cache=global_cache):
 
             # recurse on the side where reference vertex is
             subcube = cube[:i] + vertex[i] + cube[i+1:]
-            runtime = RF(vertex, subcube)
-            w = uso.find_sink(subcube)
+            runtime, w = RF(vertex, subcube)
             total_runtime += runtime
 
             if sink[i] != w[i]:
@@ -38,10 +37,10 @@ def randomfacet_analytic(uso, n, vertices=None, cube=None, cache=global_cache):
                 # extremely inefficient xor
                 w = w[:i] + ("1" if w[i] == "0" else "0") + w[i+1:]
                 subcube = cube[:i] + w[i] + cube[i+1:]
-                runtime = RF(w, subcube)
+                runtime, _ = RF(w, subcube)
                 total_runtime += runtime
 
-        return max(1, total_runtime)
+        return max(1, total_runtime), sink
 
     if cube is None:
         cube = "*" * n
@@ -50,7 +49,7 @@ def randomfacet_analytic(uso, n, vertices=None, cube=None, cache=global_cache):
         # iterate over whole set of vertices
         vertices = generate_vertices(n)
 
-    return sum(RF(vertex, cube) for vertex in vertices)
+    return sum(RF(vertex, cube)[0] for vertex in vertices)
 
 
 def randomfacet_sample(uso, N, cube=None, vertex=None):

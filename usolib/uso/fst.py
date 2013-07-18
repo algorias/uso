@@ -79,7 +79,6 @@ class SimpleFST(object):
         return [o for (o, s) in zip(self.transduce(vertex), subcube) if s == "*"]
     
 
-    @memoize()
     def find_sink(self, subcube):
         # find sink through structure of automaton, i.e. cheating
         res = []
