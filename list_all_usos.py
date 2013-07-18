@@ -42,9 +42,7 @@ if __name__ == "__main__":
         if fingerprint in test_set:
             continue
         test_set.add(fingerprint)
-        for i in uso.get_edges():
-            print >> fd, i
-        print >> fd
+        print >> fd, ", ".join(str(i) for i in uso.get_edges())
         count += 1
 
     print "%7d  %7d" % (raw_count, count)
