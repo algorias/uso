@@ -25,43 +25,40 @@ class SimpleFST(object):
         else:
             assert edges is None
         self.table = table
+        self.states = set(state for (state, v) in self.table)
         self.start_state = start
+        self.k = len(self.states)
         self.validate_table()
         self.build_inverse_table()
 
-    
 
     def validate_table(self):
         """ Check if table describes a simple FST."""
-        states = set(state for (state, v) in self.table)
-        assert self.start_state in states
+        assert self.start_state in self.states
 
         for state in states:
             # make sure transitions exist and are valid
             nextstate, out0 = self.table[state, "0"]
-            assert nextstate in states
+            assert nextstate in self.states
             assert out0 in "+-"
 
             nextstate, out1 = self.table[state, "1"]
-            assert nextstate in states
+            assert nextstate in self.states
             assert out1 in "+-"
 
             # make sure state is either even or odd
             assert out0 != out1
 
-
     
     def build_inverse_table(self):
         """ Precalculate inverse state transition table to find + and - transitions easily."""
-        states = set(state for (state, v) in self.table)
         self.inv_table = {}
 
-        for state in states:
+        for state in self.states:
             nextstate, out = self.table[state, "0"]
             self.inv_table[state, out] = nextstate, "0"
             nextstate, out = self.table[state, "1"]
             self.inv_table[state, out] = nextstate, "1"
-
 
    
     def transduce(self, vertex):
@@ -75,7 +72,6 @@ class SimpleFST(object):
     def outmap(self, vertex, subcube):
         # NOTE: subcubes are described by words in {0,1,*}*
         # this method makes no attempt to validate that the vertex actually belongs to the subcube
-
         return [o for (o, s) in zip(self.transduce(vertex), subcube) if s == "*"]
     
 
@@ -100,7 +96,6 @@ class SimpleFST(object):
 
         If two such fingerprints are equal, then the automatons are equivalent up to n dimensions.
         """
-
         return "".join(self._fingerprint_itr(n, self.start_state))
 
 
