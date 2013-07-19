@@ -17,13 +17,12 @@ def runtime_analytic(N, uso):
 
 
 def print_statistic(usos):
-    avg = average([runtime for (runtime, uso) in usos])
-    mx = max(runtime for (runtime, uso) in usos)
+    avg = average(runtime for (runtime, uso) in usos)
     print "avg runtime: %s" % avg
     print "max runtime: %s" % usos[-1][0]
     print "min runtime: %s" % usos[0][0]
 
-    print "slowest candidate:"
+    print "fst with max runtime:"
     for i in usos[-1][1].get_edges():
         print i
 
@@ -32,18 +31,18 @@ def print_statistic(usos):
 
 if __name__ == "__main__":
     K = 6
+    n_processes = 6
     #usos_itr = usolib.uso.all_by_states(K)
     #usos_itr = usolib.uso.all_bosshard(K)
     usos_itr = usolib.uso.all_bosshard_half_odd(K)
-    usos = list(usolib.uso.fst_helpers.uniq(usos_itr))
+    usos = usolib.uso.fst_helpers.uniq(usos_itr)
 
-    exit()
-
-    for N in range(8, 39, 2):
+    for N in range(6, 37, 2):
         print "N=%s" % N
-        print "testing %d usos" % len(usos)
+        #print "testing %d usos" % len(usos)
         t = time.time()
-        lst = pmap(runtime_sampled, usos, processes=6, args=(N,))
+        lst = pmap(runtime_sampled, usos, processes=n_processes, args=(N,))
+        print "tested %d usos" % len(lst)
         print "finished in %d seconds" % (time.time() - t)
 
         lst = sorted(lst)
