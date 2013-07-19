@@ -15,32 +15,35 @@ def randomfacet_analytic(uso, n, vertices=None, cube=None, cache=global_cache):
     and all random choices. To get the expectation of a single execution, divide by N!*|vertices|
     """
     
+    @memoize()
+    def find_sink(subcube):
+        return uso.find_sink(subcube)
+    
     @memoize(cache)
     def RF(vertex, cube):
-        #if n == 0:
         #if vertex == cube:
             #return 1, vertex
 
         total_runtime = 0
-        sink = uso.find_sink(cube)
+        sink = find_sink(cube)
         for i in range(n):
             if cube[i] != "*":
                 continue
 
             # recurse on the side where reference vertex is
             subcube = cube[:i] + vertex[i] + cube[i+1:]
-            runtime, w = RF(vertex, subcube)
+            runtime = RF(vertex, subcube)
             total_runtime += runtime
+            w = find_sink(subcube)
 
             if sink[i] != w[i]:
                 # sink not found in first recursive call, replace vertex with w ^ {i}
-                # extremely inefficient xor
                 w = w[:i] + ("1" if w[i] == "0" else "0") + w[i+1:]
                 subcube = cube[:i] + w[i] + cube[i+1:]
-                runtime, _ = RF(w, subcube)
+                runtime = RF(w, subcube)
                 total_runtime += runtime
 
-        return max(1, total_runtime), sink
+        return max(1, total_runtime)
 
     if cube is None:
         cube = "*" * n
@@ -49,7 +52,7 @@ def randomfacet_analytic(uso, n, vertices=None, cube=None, cache=global_cache):
         # iterate over whole set of vertices
         vertices = generate_vertices(n)
 
-    return sum(RF(vertex, cube)[0] for vertex in vertices)
+    return sum(RF(vertex, cube) for vertex in vertices)
 
 
 def randomfacet_sample(uso, N, cube=None, vertex=None):
