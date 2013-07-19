@@ -19,8 +19,17 @@ def factorial(n):
     return reduce(operator.mul, xrange(1, n+1), 1.0)
 
 
-def average(lst):
-    return sum(lst) / float(len(lst))
+def average(itr):
+    """
+    Average implementation that handles iterators well and doesn't consume extra memory, 
+    in exchange for a slower speed.
+    """
+    total = 0
+    count = 0
+    for i in itr:
+        total += i
+        count += 1
+    return total / float(count)
 
 
 def int_to_vertex(x, n):
@@ -46,10 +55,11 @@ class CountingDict(dict):
 
 pool = None
 
-def pmap(f, data, processes=1, args=()):
+def pmap(f, data, processes=1, args=(), batchsize=1000):
     """
     Paralell map.
     """
+    # functools.partial is safe as it can be pickled, unlike lambdas
     f = functools.partial(f, *args)
 
     if processes == 1:
@@ -57,8 +67,7 @@ def pmap(f, data, processes=1, args=()):
 
     old_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    #pool = multiprocessing.Pool(processes=processes)
-
+    # initialize pool the first time pmap is called
     global pool
     if pool is None:
         pool = multiprocessing.Pool(processes=processes)
@@ -75,12 +84,27 @@ def pmap(f, data, processes=1, args=()):
 
     signal.signal(signal.SIGINT, handler)
 
-    async_result = pool.map_async(f, data)
-    while not async_result.ready():
-        time.sleep(0.01)
+    # split data into chunks to feed the workers as soon as possible.
+    # TODO: can single jobs be submitted to pool?
+    data_itr = iter(data)
+    batch = [i for (i, _) in zip(data_itr, range(batchsize*processes))]
+    async_results = []
+
+    while batch:
+        async_results.append(pool.map_async(f, batch))
+        batch = [i for (i, _) in zip(data_itr, range(batchsize*processes))]
 
     signal.signal(signal.SIGINT, old_handler)
 
-    return async_result.get()
+    # wait for all batches to finish
+    for result in async_results:
+        while not result.ready():
+            time.sleep(0.01)
+
+    # compile and return results
+    res = []
+    for result in async_results:
+        res.extend(result.get())
+    return res
 
 
