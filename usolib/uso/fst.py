@@ -1,6 +1,5 @@
 import itertools
 
-from usolib.helpers import memoize
 
 class SimpleFST(object):
     """
@@ -111,7 +110,6 @@ class SimpleFST(object):
             yield i
 
 
-    @memoize()
     def fingerprint_subcube(self, subcube):
         """
         produce a fingerprint of the transducer of a subcube.
