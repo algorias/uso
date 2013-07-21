@@ -171,9 +171,6 @@ def _itr_by_states(k, n_odd):
 
     for to_states in itertools.product(states, repeat=2*k):
         edges = [(q1, a, b, q2) for ((q1, a, b), q2) in zip(available_edges, to_states)]
-        if not minimal_heuristic(edges):
-            # fst can be realized with less states
-            continue
         yield fst.SimpleFST(edges=edges)
 
 
@@ -217,8 +214,5 @@ def _itr_bosshard(k, n_odd):
 
         for to_state in itertools.product(*seq):
             edges = [(q1, a, b, q2) for ((q1, a, b), q2) in zip(available, to_state)]
-            if not minimal_heuristic(edges):
-                # fst can be realized with less states
-                continue
             yield fst.SimpleFST(edges=edges)
         
