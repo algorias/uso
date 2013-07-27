@@ -113,31 +113,58 @@ class SimpleFST(object):
     def fingerprint_subcube(self, subcube):
         """
         produce a fingerprint of the transducer of a subcube.
-        doesn't guarantee absolutely identical automatons, only identical up to the dimension they're being
-        evaluated to.
+        doesn't guarantee absolutely identical automatons, only identical up to the dimension of the subcube
+        they're being evaluated on.
         """
-        return "".join(self._fingerprint_subcube_itr(subcube, self.start_state))
+        # Forward pass to accumulate data for each active dimension, namely a set of reachable states and
+        # an updated state transition table
+        states_per_dim = []
+        table_per_dim = []
+        FIRST = True
+        # each chunk is a number of skipped dimensions followed by a spanned dimension
+        for chunk in subcube.split("*"):
+            transitions = dict((q, reduce(lambda q, dim: self.table[q, dim][0], chunk, q))
+                               for q in self.states)
+            table = dict(((q1, a), (transitions[q2], b)) for ((q1, a), (q2, b)) in self.table.iteritems())
+            table_per_dim.append(table)
 
+            if FIRST:
+                states = set([transitions[self.start_state]])
+                FIRST = False
+            else:
+                states = set()
+                previous_states = states_per_dim[-1]
+                for state in previous_states:
+                    states.add(table[state, "0"][0])
+                    states.add(table[state, "1"][0])
+            states_per_dim.append(states)
 
-    def _fingerprint_subcube_itr(self, subcube, state):
-        if subcube == "":
-            return
+        # Backward pass to create fingerprint. In the last dimension, all states of the same parity are 
+        # identical. For previous dimensions, states are defined by their parity and the parity of both
+        # their children.
+        state_index = dict((q, "") for q in self.states)
+        res = []
+        for (reachable_states, table) in reversed(zip(states_per_dim[:-1], table_per_dim[1:])):
+            # assign a class triple to each state, namely the parity of the state, and the class of its
+            # two neighbors
+            state_lst = [(q, table[q, "0"][1] + state_index[table[q, "0"][0]] + state_index[table[q, "1"][0]])
+                         for q in reachable_states]
 
-        head = subcube[0]
-        subcube = subcube[1:]
-        if head == "*":
-            nextstate, out = self.table[state, "0"]
-            yield out
-            for i in self._fingerprint_subcube_itr(subcube, nextstate):
-                yield i
-            nextstate, out = self.table[state, "1"]     
-            for i in self._fingerprint_subcube_itr(subcube, nextstate):
-                yield i
-        else:
-            nextstate, _ = self.table[state, head]
-            for i in self._fingerprint_subcube_itr(subcube, nextstate):
-                yield i
-        
+            # find out what classes we have, put them in some canonical order,
+            # then assign an index to each class (basically a reverse lookup of the list of classes)
+            classes = sorted(set(c for (state, c) in state_lst))
+            class_index = dict((c, str(i)) for (i,c) in enumerate(classes))
+            
+            # assign to each state the index of its class
+            state_index = dict((q, class_index[c]) for (q, c) in state_lst)
+    
+            # add the result of this iteration to the fingerprint
+            #res.extend(sorted(set(c for (state, c) in state_lst if state in states)))
+            res.extend(classes)
+            res.append("|")
+
+        return "".join(res)
+
 
     def get_edges(self):
         edges = [(q_old, a, b, q_new) for ((q_old, a), (q_new, b)) in self.table.iteritems()]
