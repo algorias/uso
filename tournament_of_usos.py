@@ -35,7 +35,7 @@ if __name__ == "__main__":
     n_processes = 4
     #usos_itr = usolib.uso.all_by_states(K)
     usos_itr = usolib.uso.all_bosshard(K)
-    usos = usolib.uso.fst_helpers.uniq(usos_itr)
+    usos = usolib.fst_helpers.uniq(usos_itr)
 
     for N in range(6, 10):
         print "N=%s" % N
