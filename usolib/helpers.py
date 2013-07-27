@@ -44,6 +44,18 @@ def get_dimension(cube):
     return cube.count("*")
 
 
+def global2local(vertex, subcube):
+    if vertex is None:
+        return None
+    return "".join(val for (val, dim) in zip(vertex, subcube) if dim == "*")
+
+def local2global(vertex, subcube):
+    if vertex is None:
+        return None
+    itr = iter(vertex)
+    return "".join(dim if dim != "*" else next(itr) for dim in subcube)
+
+
 class CountingDict(dict):
     def __init__(self):
         self.counter = Counter()

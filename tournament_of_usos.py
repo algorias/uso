@@ -12,8 +12,9 @@ def runtime_sampled(N, uso):
 
 
 def runtime_analytic(N, uso):
-    #return uso, usolib.randomfacet.randomfacet_analytic(uso, N, cache={})
-    return usolib.randomfacet.randomfacet_analytic(uso, N, cache={}) / float(factorial(N) * 2**N), uso
+    #return usolib.randomfacet.randomfacet_analytic_new(uso, N, cache={}), uso
+    return usolib.randomfacet.randomfacet_analytic_new(uso, N) / float(factorial(N) * 2**N), uso
+    return usolib.randomfacet.randomfacet_analytic_new(uso, N, cache= {}) / float(factorial(N) * 2**N), uso
 
 
 def print_statistic(usos):
@@ -30,30 +31,30 @@ def print_statistic(usos):
 
 
 if __name__ == "__main__":
-    K = 6
-    n_processes = 6
+    K = 4
+    n_processes = 4
     #usos_itr = usolib.uso.all_by_states(K)
-    #usos_itr = usolib.uso.all_bosshard(K)
-    usos_itr = usolib.uso.all_bosshard_half_odd(K)
+    usos_itr = usolib.uso.all_bosshard(K)
     usos = usolib.uso.fst_helpers.uniq(usos_itr)
 
-    for N in range(6, 37, 2):
+    for N in range(6, 10):
         print "N=%s" % N
         #print "testing %d usos" % len(usos)
         t = time.time()
-        lst = pmap(runtime_sampled, usos, processes=n_processes, args=(N,))
+        lst = pmap(runtime_analytic, usos, processes=n_processes, args=(N,))
         print "tested %d usos" % len(lst)
         print "finished in %d seconds" % (time.time() - t)
 
         lst = sorted(lst)
         print_statistic(lst)
-        lst = lst[-int(len(lst)*0.5):]
+        lst = lst[-int(len(lst)*0.1):]
         usos = [uso for (runtime, uso) in lst]
 
-    print "all survivors:"
-    for uso in usos:
-        for i in uso.get_edges():
-            print i
-        print
+    with open("/home/vitor/tournament_survivors.txt", "w") as fd:
+        for runtime, uso in lst:
+            print >> fd, runtime
+            for i in uso.get_edges():
+                print >> fd, i
+            print >> fd
 
 

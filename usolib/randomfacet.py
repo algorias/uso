@@ -8,14 +8,21 @@ global_cache = {}
 def randomfacet_analytic_new(uso, n, cache=global_cache):
     # sum double the runtime at each recursion step to keep everything in integers.
 
+    # as soon as this function leaves the namespace, the associated cache is garbage collected.
     @memoize()
-    def find_sink(subcube):
-        return uso.find_sink(subcube)
-    
-    @memoize(cache)
+    def fingerprint_subcube(cube):
+        return uso.fingerprint_subcube(cube)
+
+    #@memoize(cache)
     def RF(vertex, cube):
+        # caching behaviour
+        fingerprint = fingerprint_subcube(cube)
+        local_vertex = global2local(vertex, cube)
+        if (local_vertex, fingerprint) in cache:
+            return cache[local_vertex, fingerprint]
+        
         total_runtime = 0
-        sink = find_sink(cube)
+        sink = uso.find_sink(cube)
         for i in range(n):
             if cube[i] != "*":
                 continue
@@ -24,7 +31,7 @@ def randomfacet_analytic_new(uso, n, cache=global_cache):
                 # vertex u.a.r.
                 good_cube = cube[:i] + sink[i] + cube[i+1:]
                 bad_cube = cube[:i] + ("1" if sink[i] == "0" else "0") + cube[i+1:]
-                w = find_sink(bad_cube)
+                w = uso.find_sink(bad_cube)
                 w = w[:i] + good_cube[i] + w[i+1:]
                 total_runtime += RF(None, good_cube) + RF(None, bad_cube) + RF(w, good_cube)
             else:
@@ -33,12 +40,14 @@ def randomfacet_analytic_new(uso, n, cache=global_cache):
                 total_runtime += 2 * RF(vertex, subcube)
                 if sink[i] != subcube[i]:
                     # sink not found in first recursive call, replace vertex with w ^ {i}
-                    w = find_sink(subcube)
+                    w = uso.find_sink(subcube)
                     w = w[:i] + ("1" if w[i] == "0" else "0") + w[i+1:]
                     subcube = cube[:i] + w[i] + cube[i+1:]
                     total_runtime += 2 * RF(w, subcube)
 
-        return max(1, total_runtime)
+        res = max(1, total_runtime)
+        cache[local_vertex, fingerprint] = res
+        return res
 
     return RF(None, "*"*n)
 
