@@ -19,6 +19,10 @@ def factorial(n):
     return reduce(operator.mul, xrange(1, n+1), 1.0)
 
 
+def nck(n,k):
+    return factorial(n) / (factorial(k) * factorial(n-k))
+
+
 def average(itr):
     """
     Average implementation that handles iterators well and doesn't consume extra memory, 
@@ -30,6 +34,14 @@ def average(itr):
         total += i
         count += 1
     return total / float(count)
+
+
+def matousek_runtime(k):
+    """
+    Expected runtime of randomly chosen matousek uso
+    """
+    return sum(0.5**l / factorial(l) * nck(k, l)
+               for l in range(1, k+1))
 
 
 def int_to_vertex(x, n):
