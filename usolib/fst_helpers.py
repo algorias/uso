@@ -1,13 +1,4 @@
-
-def is_bosshard(edges):
-    # dict of parities
-    d = dict((q1, b) for (q1, a, b, _) in edges if a == "0")
-
-    res = set((q1, d[q2]) for (q1, _, _, q2) in edges)
-    if len(res) == len(edges):
-        return True
-    return False
-
+import itertools
 
 def reachable_states(uso):
     """
@@ -41,31 +32,51 @@ def hopcroft_fingerprint(uso):
     # initially, separate states by their parities
     class_index = {"+": "0", "-": "1"}
     state_index = dict((q, class_index[uso.table[q, "0"][1]]) for q in uso.states)
-    res = [state_index[uso.start_state]]
 
-    for i in range(max(1, uso.k - 1)):
+    for i in range(max(1, uso.k)):
         # assign a class triple to each state, namely the class of the state itself, of its
         # 0-neighbor and of its 1-neighbor
         state_lst = [(q, (state_index[q], state_index[uso.table[q, "0"][0]], state_index[uso.table[q, "1"][0]]))
                      for q in uso.states]
 
-        # find out what classes we have, put them in some canonical order
-        # then assign an index to each class (basically a reverse lookup of the list of classes)
-        classes = sorted(set(c for (state, c) in state_lst))
+        # assign an index to each class (basically a reverse lookup of the list of classes)
+        # the order doesn't matter, as we're only interested in whether or not there are redundant states
+        classes = set(c for (state, c) in state_lst)
         class_index = dict((c, str(i)) for (i,c) in enumerate(classes))
 
         # assign to each state the index of its class
         state_index = dict((q, class_index[c]) for (q, c) in state_lst)
 
-        # add the result of this iteration to the fingerprint
-        res.append(state_index[uso.start_state])
-        res.extend("".join(c) for c in classes)
 
     if len(classes) < uso.k:
         # transducer can be realized with fewer states, return dummy fingerprint
         return ""
 
-    return "".join(res)
+    # build the FST
+    edges = []
+    indices = {}
+    new_index = (str(i) for i in itertools.count()).next
+    
+    def DFS(q):
+        i = new_index()
+        indices[q] = i
+        q_left, b_left = uso.table[q, "0"]
+        q_right, b_right = uso.table[q, "1"]
+        if q_left not in indices:
+            DFS(q_left)
+        if q_right not in indices:
+            DFS(q_right)
+        edges.extend(( (i, "0", b_left, indices[q_left]), (i, "1", b_right, indices[q_right]) ))
+
+    DFS(uso.start_state)
+
+    # edges are fine and good, but the fingerprint can be more compact
+    #return tuple(edges)
+    return "".join("".join(edge[2:] if i%2 else edge) 
+                   for (i, edge) in enumerate(edges))
+        
+
+    return "".join("".join(e) for e in edges)
 
 
 def uniq(usos, quiet=False):
@@ -75,6 +86,8 @@ def uniq(usos, quiet=False):
     test = set([""])
     count = 0
     uniq_count = 0
+    if not quiet:
+        print "  #Total     #Uniq"
     for uso in usos:
         count += 1
         if (not quiet) and (not count % 1000):
