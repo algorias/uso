@@ -12,9 +12,8 @@ def runtime_sampled(N, uso):
 
 
 def runtime_analytic(N, uso):
-    #return usolib.randomfacet.randomfacet_analytic_new(uso, N, cache={}), uso
-    return usolib.randomfacet.randomfacet_analytic_new(uso, N) / float(factorial(N) * 2**N), uso
-    return usolib.randomfacet.randomfacet_analytic_new(uso, N, cache= {}) / float(factorial(N) * 2**N), uso
+    #return usolib.randomfacet.randomfacet_analytic(uso, N, cache={}), uso
+    return usolib.randomfacet.randomfacet_analytic(uso, N) / float(factorial(N) * 2**N), uso
 
 
 def print_statistic(usos):
@@ -33,8 +32,7 @@ def print_statistic(usos):
 if __name__ == "__main__":
     K = 4
     n_processes = 4
-    #usos_itr = usolib.uso.all_by_states(K)
-    usos_itr = usolib.uso.all_bosshard(K)
+    usos_itr = usolib.uso.all_by_states(K)
     usos = usolib.fst_helpers.uniq(usos_itr)
 
     for N in range(6, 10):

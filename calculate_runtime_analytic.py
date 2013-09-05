@@ -5,7 +5,7 @@ from usolib.helpers import *
 
 def main(n):
     uso = usolib.uso.bad4state()
-    return usolib.randomfacet.randomfacet_analytic_new(uso, n)
+    return usolib.randomfacet.randomfacet_analytic(uso, n)
 
 
 if __name__ == "__main__":

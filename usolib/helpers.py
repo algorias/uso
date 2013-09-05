@@ -1,16 +1,19 @@
-import time, multiprocessing, operator, os, sys, signal, functools
+import time, multiprocessing, operator, os, sys, signal, functools, random
 
 from collections import Counter
 
 
-def memoize(cache=None):
+def memoize(cache=None, cache_key=lambda *x: x):
     if cache is None:
         cache = {}
     def decorator(f):
         def inner(*args):
-            if args not in cache:
-                cache[args] = f(*args)
-            return cache[args]
+            k = cache_key(*args)
+            if k in cache:
+                return cache[k]
+            res = f(*args)
+            cache[k] = res
+            return res
         return inner
     return decorator
 
