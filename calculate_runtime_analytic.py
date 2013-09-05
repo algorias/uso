@@ -13,5 +13,5 @@ if __name__ == "__main__":
     for n in range(1, 11):
         t = time.time()
         res = main(n) / float(factorial(n) * 2**n)
-        print "%2d\t%.2fs\t%.4f" %(n, time.time() - t, res)
+        print "%2d\t%.2fs\t%.6f" %(n, time.time() - t, res)
 
